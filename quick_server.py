@@ -15,4 +15,3 @@ rmq_publisher.connect()
 rmq_consumer = PikaConsumer(env_conf=env_conf, io_loop=io_loop, publisher=rmq_publisher)
 rmq_consumer.connect()
 io_loop.start()
-

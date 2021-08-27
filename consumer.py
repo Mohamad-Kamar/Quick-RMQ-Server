@@ -63,7 +63,7 @@ class PikaConsumer(PikaClient):
         received_id = payload["id"]
         new_payload = {}
         new_payload["correlationId"] = received_id
-        service_id = payload["request-characteristics"]["url-query-parameters"]["value"]
+        service_id = payload["request-characteristics"]["url-query-parameters"][0]["value"]
         new_payload["eventTime"] = str(datetime.datetime.now())
         new_payload["eventId"] = self._generate_event_id()
         new_payload["event"] = {
@@ -72,6 +72,19 @@ class PikaConsumer(PikaClient):
                     "href":"/l3vpn",
                     "status":"success"
                 }
+        }
+
+        sample_request = {
+            "correlationId":"some_id",
+            "eventTime":"time",
+            "eventId":"id",
+            "event":{
+                "service":{
+                    "id":"<service-id>",
+                    "href":"/l3vpn",
+                    "status":"success"
+                }                
+            }
         }
         self.publisher.publish(new_payload)
         self.channel.basic_ack(basic_deliver.delivery_tag)
