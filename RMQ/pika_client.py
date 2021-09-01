@@ -41,7 +41,7 @@ class PikaClient(object):
             self.connection = tornado_connection.TornadoConnection(
                 params, custom_ioloop=self.io_loop, on_open_callback=self.on_connected)
 
-            self.connection.add_on_open_error_callback(self.error)
+            self.connection.add_on_open_error_callback(self.on_connection_error)
             self.connection.add_on_close_callback(self.on_connection_closed)
             logger.info("Connect method ended")
         except Exception as e:
@@ -73,7 +73,7 @@ class PikaClient(object):
         # move this to the on_channel_open methods of consumer and publisher
         self.channel.add_on_close_callback(self.on_channel_closed)
 
-    def error(self, conn, reason):
+    def on_connection_error(self, conn, reason):
         """
         callback function that is called when there is an error in establishing connection to RMQ channel
 
@@ -90,7 +90,8 @@ class PikaClient(object):
             logger.critical('Authentication failed at RabbitMQ, not attempting to retry automatically')
         elif isinstance(reason, AMQPConnectionError):
             logger.warning('Attempting to re-establish connection in 10 seconds')
-            self.connect()
+            self.io_loop.call_later(10, self.connect)
+
 
     def close(self):
         """ Stop the client by closing the channel and connection. """

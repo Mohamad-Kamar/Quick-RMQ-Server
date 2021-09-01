@@ -10,9 +10,9 @@ DATE_FORMAT = '%Y-%m-%dT%H:%M:%S'
 log_conf = {
     'location': '../logs/',
     'level': 'INFO',
-    'log_file_name': 'l3vpn-orchestrator',
+    'log_file_name': 'l3vpn-controller',
     'app_code': '0017',
-    'app_name': 'l3vpn-orchestrator'
+    'app_name': 'l3vpn-controller'
 }
 
 class HomaLoggerAdapter(logging.LoggerAdapter):
@@ -45,7 +45,7 @@ def get_homa_logger(name):
         file_handler.setFormatter(fmtr)
         stderr_handler = logging.StreamHandler(sys.stderr)
         stderr_handler.setFormatter(fmtr)
-        logger.addHandler(file_handler)
+        # logger.addHandler(file_handler)
         logger.addHandler(stderr_handler)
     format_conf = {'app_code': log_conf['app_code'], 'app_name': log_conf['app_name']}
     logger = HomaLoggerAdapter(logger, format_conf)

@@ -1,6 +1,6 @@
 const http = require("http");
 const hostname = '127.0.0.1';
-const port = 3000;
+const port = process.env.port || 8080;
 
 const server = http.createServer((req, res) => {
     let data = '';
@@ -16,4 +16,3 @@ const server = http.createServer((req, res) => {
 server.listen(port, hostname, () => {
   console.log(`Server running at http://${hostname}:${port}/`);
 });
-//"/execute/entities/v1.1/bi" + "/yang/bi/mpls/bi-services"
