@@ -6,6 +6,15 @@ import hashlib
 import time
 
 
+
+def _get_vpn_id_from_nb_payload(url):
+    logger.info("Getting vpn-id from NB Payload")
+    url_parts = url.split("/")
+    for i in range(len(url_parts)):
+        url_part = url_parts[i]
+        if url_part == "service":
+            return url_parts[i+1]
+
 class PikaConsumer(PikaClient):
     """
     Class used for consuming messages from message bus
@@ -63,7 +72,26 @@ class PikaConsumer(PikaClient):
         received_id = payload["id"]
         new_payload = {}
         new_payload["correlationId"] = received_id
-        service_id = payload["request-characteristics"]["url-query-parameters"][0]["value"]
+
+
+        new_payload["eventTime"] = str(datetime.datetime.now())
+
+        request_type = payload["request-characteristics"]["request_type"]
+        new_payload["eventType"] = request_type
+
+        request_characteristics = payload["request-characteristics"]
+
+
+        #Cases of put and post
+        if request_type in ["CREATE_VPN", "UPDATE_VPN"]:
+            service_id = payload["request-characteristics"]["payload"]["serviceSpecification"]["id"]
+        elif request_type in ["CREATE_SITE"]:
+            service_id = payload["request-characteristics"]["payload"]["supportingService"][0]["serviceSpecification"]["id"]
+        else:
+            url = request_characteristics["url"]
+            service_id = _get_vpn_id_from_nb_payload(url)
+
+        #Cases of activate, deactivate and delete
         new_payload["eventTime"] = str(datetime.datetime.now())
         new_payload["eventId"] = self._generate_event_id()
         new_payload["event"] = {
